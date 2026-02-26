@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Robux Tap</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg: #0a0c12;
+    --card: #1a1f2e;
+    --accent: #00d084;
+    --accent-dark: #00a066;
+    --text: #e0f0ff;
+    --gray: #8a9bb8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    text-align: center;
+    overflow-x: hidden;
+  }
+
+  .page {
+    display: none;
+    padding: 24px 16px 100px;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  h1, h2 {
+    margin-bottom: 16px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  h1 {
+    font-size: 3.2rem;
+    background: linear-gradient(90deg, #00ff9c, #00d084);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .tap {
+    width: 180px;
+    height: 180px;
+    background: linear-gradient(145deg, #23293a, #1a1f2e);
+    border-radius: 50%;
+    margin: 32px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--accent);
+    box-shadow: 
+      0 10px 30px rgba(0, 208, 132, 0.15),
+      inset 0 -8px 20px rgba(0,0,0,0.6),
+      inset 0 4px 10px rgba(255,255,255,0.08);
+    transition: all 0.15s ease;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .tap:active {
+    transform: scale(0.92);
+    box-shadow: 
+      0 6px 20px rgba(0, 208, 132, 0.25),
+      inset 0 -4px 10px rgba(0,0,0,0.7);
+  }
+
+  .menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(20, 25, 40, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0, 208, 132, 0.12);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    z-index: 100;
+  }
+
+  .menu button {
+    background: none;
+    border: none;
+    color: var(--gray);
+    font-size: 26px;
+    padding: 8px 16px;
+    transition: all 0.2s;
+  }
+
+  .menu button:hover,
+  .menu button:focus {
+    color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  input {
+    padding: 14px 16px;
+    margin: 12px auto;
+    width: 90%;
+    max-width: 360px;
+    border: none;
+    border-radius: 12px;
+    background: var(--card);
+    color: white;
+    font-size: 16px;
+    display: block;
+  }
+
+  input::placeholder {
+    color: #6b7a9a;
+  }
+
+  .btn {
+    background: linear-gradient(90deg, var(--accent), #00b070);
+    padding: 14px 32px;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    margin: 16px auto;
+    display: block;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 208, 132, 0.3);
+    transition: all 0.2s;
+  }
+
+  .btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 4px 12px rgba(0, 208, 132, 0.2);
+  }
+
+  .loader {
+    border: 6px solid #2a334a;
+    border-top: 6px solid var(--accent);
+    border-radius: 50%;
+    width: 64px;
+    height: 64px;
+    animation: spin 1s linear infinite;
+    margin: 32px auto;
+  }
+
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+
+  .small {
+    font-size: 13px;
+    color: #5a6b88;
+    margin: 40px 0 80px;
+    opacity: 0.7;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Главная -->
+<div id="home" class="page active">
+  <h2>Robux Tap</h2>
+  <h1 id="balance">0 R$</h1>
+  <div class="tap" onclick="tap()">TAP</div>
+</div>
+
+<!-- Задания -->
+<div id="tasks" class="page">
+  <h2>Задания</h2>
+  <p>Подпишись на канал → +50 R$</p>
+  <p>Зайди завтра → +100 R$</p>
+  <p>Натапай 1000 раз → +200 R$</p>
+</div>
+
+<!-- Вывод -->
+<div id="withdraw" class="page">
+  <h2>Вывод</h2>
+  <input placeholder="Ник в Roblox">
+  <input placeholder="Ник в Telegram">
+  <input placeholder="Сколько натапал">
+  <button class="btn" onclick="startLoad()">Отправить заявку</button>
+  <div id="load"></div>
+</div>
+
+<!-- Профиль -->
+<div id="profile" class="page">
+  <h2>Профиль</h2>
+  <p>Ник: ???</p>
+  <p id="stats">Тапов: 0</p>
+</div>
+
+<!-- Нижнее меню -->
+<div class="menu">
+  <button onclick="show('home')">🏠</button>
+  <button onclick="show('tasks')">📋</button>
+  <button onclick="show('withdraw')">💰</button>
+  <button onclick="show('profile')">👤</button>
+</div>
+
+<script>
+let balance = 0;
+let taps = 0;
+
+function tap() {
+  balance += 0.99;
+  taps++;
+  document.getElementById("balance").innerText = balance.toFixed(2) + " R$";
+  document.getElementById("stats").innerText = "Тапов: " + taps;
+}
+
+function show(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function startLoad() {
+  document.getElementById("load").innerHTML = 
+    "<div class='loader'></div><p style='margin-top:16px;'>Проверка...</p>";
+  
+  setTimeout(() => {
+    document.getElementById("load").innerHTML = 
+      "<p style='color:#00d084; margin-top:20px;'>Чтобы завершить — напиши @taprobuxtap в Telegram</p>";
+  }, 3200);
+}
+</script>
+
+<div class="small">
+  Robux Tap • Версия 1.0
+</div>
+
+</body>
+</html>
